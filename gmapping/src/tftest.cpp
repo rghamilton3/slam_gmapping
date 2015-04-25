@@ -1,7 +1,7 @@
 #include <cstdio>
 #include "sensor_msgs/LaserScan.h"
 #include "ros/node.h"
-#include "tf/transform_listener.h"
+#include <tf2_ros/transform_listener.h>
 
 class Test
 {
@@ -9,8 +9,8 @@ class Test
     Test()
     {
       node_ = new ros::Node("test");
-      tf_ = new tf::TransformListener(*node_, true, 
-                                      ros::Duration(10));
+      tf_.reset(new tf2::Buffer(ros::Duration(10)));
+      tfl_ = new tf2_ros::TransformListener(*tf_, *node_, true);
       tf_->setExtrapolationLimit( ros::Duration().fromSec(0.2));
 
       node_->subscribe("base_scan", scan_, &Test::laser_cb, this, -1);
@@ -52,7 +52,8 @@ class Test
 
   private:
     ros::Node* node_;
-    tf::TransformListener* tf_;
+    tf::TransformListener* tfl_;
+    boost::shared_ptr<tf2_ros::Buffer> tf_;
     sensor_msgs::LaserScan scan_;
 };
 

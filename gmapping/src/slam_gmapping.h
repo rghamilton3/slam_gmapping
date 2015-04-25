@@ -20,10 +20,11 @@
 #include "sensor_msgs/LaserScan.h"
 #include "std_msgs/Float64.h"
 #include "nav_msgs/GetMap.h"
-#include "tf/transform_listener.h"
-#include "tf/transform_broadcaster.h"
+#include <tf2/LinearMath/Transform.h>
+#include <tf2_ros/transform_listener.h>
+#include <tf2_ros/transform_broadcaster.h>
 #include "message_filters/subscriber.h"
-#include "tf/message_filter.h"
+#include <tf2_ros/message_filter.h>
 
 #include "gmapping/gridfastslam/gridslamprocessor.h"
 #include "gmapping/sensor/sensor_base/sensor.h"
@@ -53,10 +54,11 @@ class SlamGMapping
     ros::Publisher sst_;
     ros::Publisher sstm_;
     ros::ServiceServer ss_;
-    tf::TransformListener tf_;
+    tf2_ros::Buffer tf_;
+    boost::shared_ptr<tf2_ros::TransformListener> tfL_;
     message_filters::Subscriber<sensor_msgs::LaserScan>* scan_filter_sub_;
-    tf::MessageFilter<sensor_msgs::LaserScan>* scan_filter_;
-    tf::TransformBroadcaster* tfB_;
+    tf2_ros::MessageFilter<sensor_msgs::LaserScan>* scan_filter_;
+    tf2_ros::TransformBroadcaster* tfB_;
 
     GMapping::GridSlamProcessor* gsp_;
     GMapping::RangeSensor* gsp_laser_;
@@ -72,7 +74,7 @@ class SlamGMapping
     nav_msgs::GetMap::Response map_;
 
     ros::Duration map_update_interval_;
-    tf::Transform map_to_odom_;
+    tf2::Transform map_to_odom_;
     boost::mutex map_to_odom_mutex_;
     boost::mutex map_mutex_;
 
