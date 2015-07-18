@@ -362,8 +362,8 @@ SlamGMapping::~SlamGMapping()
 bool
 SlamGMapping::getOdomPose(GMapping::OrientedPoint& gmap_pose, const ros::Time& t)
 {
-  // Get the laser's pose
-  tf::Stamped<tf::Pose> ident (tf::Transform(tf::createQuaternionFromRPY(0,0,0),
+  // Get the laser's pose that is centered
+  tf::Stamped<tf::Pose> ident (tf::Transform(tf::createQuaternionFromRPY(0,0,(angle_max_+angle_min_)/2),
                                            tf::Vector3(0,0,0)), t, laser_frame_);
   tf::Stamped<tf::Transform> odom_pose;
   try
@@ -641,7 +641,8 @@ SlamGMapping::updateMap(const sensor_msgs::LaserScan& scan)
   boost::mutex::scoped_lock map_lock (map_mutex_);
   GMapping::ScanMatcher matcher;
   double* laser_angles = new double[scan.ranges.size()];
-  double theta = angle_min_;
+  // Make sure angles are started so that they are centered
+  double theta = angle_min_ - (angle_min_ + angle_max_)/2;
   for(unsigned int i=0; i<scan.ranges.size(); i++)
   {
     if (gsp_laser_angle_increment_ < 0)
